@@ -109,23 +109,23 @@ def index():
         </head>
         <div class="selector-area-bg">
             <div class="widget-title">LESSON PLANNING ASSISTANT TOOL (BETA)</div>
-            <form method="post" style="margin-bottom: 10px; text-align: center;">
+            <form id="pmn-form" method="post" style="margin-bottom: 10px; text-align: center;">
                 <label>Series:
-                    <select name="series">
+                    <select id="series-select" name="series">
                         {% for s in series_options %}
                             <option value="{{s}}" {% if s == selected_series %}selected{% endif %}>{{s}}</option>
                         {% endfor %}
                     </select>
                 </label>
                 <label>Book:
-                    <select name="book">
+                    <select id="book-select" name="book">
                         {% for title, order in book_options[selected_series] %}
                             <option value="{{order}}" {% if order == selected_book %}selected{% endif %}>{{title}}</option>
                         {% endfor %}
                     </select>
                 </label>
                 <label>Page:
-                    <select name="page" style="width: 80px;">
+                    <select id="page-select" name="page" style="width: 80px;">
                         {% for p in page_options %}
                             <option value="{{p}}" {% if p == selected_page %}selected{% endif %}>{{p}}</option>
                         {% endfor %}
@@ -141,26 +141,59 @@ def index():
         <div class="main-output-container">{{ result|safe }}</div>
         {% endif %}
         <script>
-        // Tab logic with outlined unselected tab
-        function showTab(tab) {
-            var byBookBtn = document.getElementById('tab-by-book');
-            var byCatBtn = document.getElementById('tab-by-category');
-            var byBookContent = document.getElementById('tab-content-by-book');
-            var byCatContent = document.getElementById('tab-content-by-category');
-            if (tab === 'by-book') {
-                byBookBtn.classList.add('selected');
-                byCatBtn.classList.remove('selected');
-                byBookContent.style.display = '';
-                byCatContent.style.display = 'none';
-            } else {
-                byBookBtn.classList.remove('selected');
-                byCatBtn.classList.add('selected');
-                byBookContent.style.display = 'none';
-                byCatContent.style.display = '';
-            }
-        }
-        // Set default tab
-        showTab('by-book');
+        // Data for dynamic dropdowns
+        const bookOptions = {{ book_options | tojson }};
+        const pageOptions = {};
+        {% for s in series_options %}
+            pageOptions["{{s}}"] = {};
+            {% for title, order in book_options[s] %}
+                pageOptions["{{s}}"]["{{order}}"] = [
+                    {% set book_pages = df[(df['Series'] == s) & (df['Book Order'] == order)]['Page'] %}
+                    {% set book_pages_int = [p for p in book_pages if p|string|int is not none] %}
+                    {% if book_pages_int|length > 0 %}
+                        {% set min_page = book_pages_int|min %}
+                        {% set max_page = book_pages_int|max %}
+                        {% for p in range(min_page, max_page+1) %}{{p}}{% if not loop.last %}, {% endif %}{% endfor %}
+                    {% else %}1{% endif %}
+                ];
+            {% endfor %}
+        {% endfor %}
+
+        // Update book dropdown when series changes
+        document.getElementById('series-select').addEventListener('change', function() {
+            const series = this.value;
+            const bookSelect = document.getElementById('book-select');
+            bookSelect.innerHTML = '';
+            bookOptions[series].forEach(function(book) {
+                const opt = document.createElement('option');
+                opt.value = book[1];
+                opt.textContent = book[0];
+                bookSelect.appendChild(opt);
+            });
+            // Trigger book change to update pages
+            bookSelect.dispatchEvent(new Event('change'));
+        });
+        // Update page dropdown when book changes
+        document.getElementById('book-select').addEventListener('change', function() {
+            const series = document.getElementById('series-select').value;
+            const bookOrder = this.value;
+            const pageSelect = document.getElementById('page-select');
+            pageSelect.innerHTML = '';
+            (pageOptions[series][bookOrder] || [1]).forEach(function(p) {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                pageSelect.appendChild(opt);
+            });
+        });
+        // On page load, ensure correct pages for initial selection
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('book-select').dispatchEvent(new Event('change'));
+        });
+        // Prevent form auto-submit on dropdown change
+        document.getElementById('pmn-form').addEventListener('submit', function(e) {
+            // Allow normal submit
+        });
         </script>
     ''',
     series_options=series_options,
