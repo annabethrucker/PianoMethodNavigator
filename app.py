@@ -47,7 +47,7 @@ def index():
         <style>
         .selector-area-bg {
             background: url('https://treefrogsolutions.co/wp-content/uploads/2025/07/Piano-Method-Navigator-Header-6.png') center center / cover no-repeat;
-            padding: 30px 0 30px 0;
+            padding: 30px 0 40px 0;
             border-radius: 12px;
             margin-bottom: 20px;
             width: 100%;
@@ -80,10 +80,11 @@ def index():
             font-size: 1.1em;
             color: #291909;
             margin-bottom: 18px;
+            margin-top: 18px;
         }
         /* Main output and grid full width, fixed for what's next */
-        .main-output-container { max-width: 1200px; width: 100%; margin: 0 auto; }
-        .pmn-whats-next-pages { max-width: 100%; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+        .main-output-container { max-width: 1200px; width: 100%; margin: 0 auto; margin-top: 30px; }
+        .pmn-whats-next-pages { max-width: 100%; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; box-sizing: border-box; overflow: hidden; }
         .pmn-whats-next-pagecard { min-width: 0; max-width: 100%; background: #FFFDF9; border-radius: 6px; padding: 10px; min-height: 80px; box-sizing: border-box; }
         /* Tab styling */
         .tab-btn { font-family: 'Quicksand', sans-serif; font-size: 16px; border-radius: 6px 6px 0 0; padding: 8px 20px; cursor: pointer; border: 2px solid #F2E0B5; background: #FFFDF9; color: #291909; margin-right: 4px; transition: background 0.2s, border 0.2s; }
@@ -95,37 +96,39 @@ def index():
         .subtitle-italic { font-style: italic; font-size: 1.1em; color: #291909; margin-bottom: 10px; display: block; }
         </style>
         </head>
-        <div class="widget-title">LESSON PLANNING ASSISTANT TOOL (BETA)</div>
         <div class="selector-area-bg">
-        <form method="post" style="margin-bottom: 10px; text-align: center;">
-            <label>Series:
-                <select name="series" onchange="this.form.submit()">
-                    {% for s in series_options %}
-                        <option value="{{s}}" {% if s == selected_series %}selected{% endif %}>{{s}}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <label>Book:
-                <select name="book" onchange="this.form.submit()">
-                    {% for title, order in book_options[selected_series] %}
-                        <option value="{{order}}" {% if order == selected_book %}selected{% endif %}>{{title}}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <label>Page:
-                <select name="page" style="width: 80px;">
-                    {% for p in page_options %}
-                        <option value="{{p}}" {% if p == selected_page %}selected{% endif %}>{{p}}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <button type="submit">LET'S PLAN</button>
-        </form>
+            <div class="widget-title">LESSON PLANNING ASSISTANT TOOL (BETA)</div>
+            <form method="post" style="margin-bottom: 10px; text-align: center;">
+                <label>Series:
+                    <select name="series" onchange="this.form.submit()">
+                        {% for s in series_options %}
+                            <option value="{{s}}" {% if s == selected_series %}selected{% endif %}>{{s}}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Book:
+                    <select name="book" onchange="this.form.submit()">
+                        {% for title, order in book_options[selected_series] %}
+                            <option value="{{order}}" {% if order == selected_book %}selected{% endif %}>{{title}}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Page:
+                    <select name="page" style="width: 80px;">
+                        {% for p in page_options %}
+                            <option value="{{p}}" {% if p == selected_page %}selected{% endif %}>{{p}}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button type="submit">LET'S PLAN</button>
+            </form>
+        </div>
+        {% if result %}
         <div class="selection-summary">
             You have selected: <strong>{{selected_series}}</strong> – <strong>{{selected_book_title}}</strong>, Page <strong>{{selected_page}}</strong>
         </div>
-        </div>
         <div class="main-output-container">{{ result|safe }}</div>
+        {% endif %}
         <script>
         // Tab logic with outlined unselected tab
         function showTab(tab) {
