@@ -32,8 +32,13 @@ def index():
         result = generate_lesson_plan(selected_series, selected_book, selected_page)
     else:
         selected_book_title = book_options[selected_series][0][0]
-    # Get all unique pages for the selected book
-    pages_for_book = sorted(df[(df['Series'] == selected_series) & (df['Book Order'] == selected_book)]['Page'].unique())
+    # Get all unique pages for the selected book, as integers
+    pages_for_book = sorted(
+        set(
+            int(p) for p in df[(df['Series'] == selected_series) & (df['Book Order'] == selected_book)]['Page']
+            if str(p).isdigit()
+        )
+    )
     return render_template_string('''
         <head>
         <link href="https://fonts.googleapis.com/css2?family=Poller+One&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
