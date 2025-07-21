@@ -181,9 +181,9 @@ def generate_lesson_plan(series, book_order, page):
     # Card 1: Review Concepts
     html_output += f"""
     <div style=\"margin-bottom: 20px;\">
-        <div style=\"background-color: {cream_dark}; padding: 15px; border-radius: 8px; border-left: 4px solid {olive};\">
+        <div style=\"background-color: {cream}; padding: 15px; border-radius: 8px; border-left: 4px solid {olive};\">
             <h3 style=\"margin: 0 0 10px 0; color: {olive}; font-family: 'Poller One', cursive;\">Review Concepts</h3>
-            <div style=\"color: {dark_brown}; font-family: 'Quicksand', sans-serif; font-size: 1.1em; margin-bottom: 10px;\">The most recent concepts your student has learned</div>
+            <span class=\"subtitle-italic\">The most recent concepts your student has learned.</span>
     """
     if not recent_concepts.empty:
         for _, row in recent_concepts.iterrows():
@@ -198,7 +198,7 @@ def generate_lesson_plan(series, book_order, page):
     html_output += f"""
     <div style=\"margin-bottom: 20px;\">
         <div style=\"background-color: {olive_light}; padding: 15px; border-radius: 8px; border-left: 4px solid {accent};\">
-            <h3 style=\"margin: 0 0 10px 0; color: {accent}; font-family: 'Poller One', cursive;\">New Concepts on This Page</h3>
+            <h3 style=\"margin: 0 0 10px 0; color: {dark_brown}; font-family: 'Poller One', cursive;\">New Concepts on This Page</h3>
     """
     if not current_page_concepts.empty:
         for _, row in current_page_concepts.iterrows():
@@ -212,23 +212,23 @@ def generate_lesson_plan(series, book_order, page):
     # Card 3: What's Next (Concepts Coming Up Next)
     html_output += f"""
     <div style=\"margin-bottom: 20px;\">
-        <div style=\"background-color: {cream}; padding: 15px; border-radius: 8px; border-left: 4px solid {olive};\">
+        <div style=\"background-color: {cream}; padding: 15px; border-radius: 8px; border-left: 4px solid {olive}; width: 100%; box-sizing: border-box;\">
             <h3 style=\"margin: 0 0 10px 0; color: {olive}; font-family: 'Poller One', cursive;\">Concepts Coming Up Next</h3>
     """
     if whats_next_by_page:
-        html_output += f'<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1000px; justify-content: flex-start;">'
+        html_output += f'<div class="pmn-whats-next-pages" style="width: 100%; box-sizing: border-box;">'
         for idx in range(4):
             if idx < len(whats_next_by_page):
                 p, page_concepts = whats_next_by_page[idx]
                 if p == 'next_book':
-                    html_output += f'<div style="min-width: 440px; max-width: 440px; background: {cream_dark}; border-radius: 6px; padding: 10px; min-height: 80px;">'
+                    html_output += f'<div style="min-width: 0; max-width: 100%; background: {cream_dark}; border-radius: 6px; padding: 10px; min-height: 80px; box-sizing: border-box;">'
                     html_output += f'<div style="font-family: Poller One, cursive; color: {olive}; font-size: 1.1em; margin-bottom: 8px;">You&#39;ve reached the end of this book!<br>Next Book: {page_concepts["title"]}</div>'
                     for page_num, concept, tags in page_concepts['concepts']:
                         html_output += f'<div style="color: {dark_brown}; font-family: Quicksand, sans-serif; margin-bottom: 3px;">P.{page_num} - {concept} {tags}</div>'
                     html_output += f'<div style="margin-top: 10px; font-size: 0.95em; font-family: Quicksand, sans-serif;"><em>For transition options to other series, visit the <a href="https://treefrogsolutions.co/transition-guide-piano-method-navigator/" target="_blank">Piano Method Navigator Transition Guide</a>.</em></div>'
                     html_output += '</div>'
                 else:
-                    html_output += f'<div style="min-width: 440px; max-width: 440px; background: {off_white}; border-radius: 6px; padding: 10px; min-height: 80px;">'
+                    html_output += f'<div style="min-width: 0; max-width: 100%; background: {off_white}; border-radius: 6px; padding: 10px; min-height: 80px; box-sizing: border-box;">'
                     html_output += f'<div style="font-family: Poller One, cursive; color: {olive}; font-size: 1.1em; margin-bottom: 8px;">Page {p}</div>'
                     for _, row in page_concepts.iterrows():
                         concept_name = get_concept_display_name(row['Concept'])
@@ -236,7 +236,7 @@ def generate_lesson_plan(series, book_order, page):
                         html_output += f'<div style="color: {dark_brown}; font-family: Quicksand, sans-serif; margin-bottom: 3px;">{concept_name} {tags}</div>'
                     html_output += '</div>'
             else:
-                html_output += f'<div style="min-width: 440px; max-width: 440px; background: transparent; border: none;"></div>'
+                html_output += f'<div style="min-width: 0; max-width: 100%; background: transparent; border: none;"></div>'
         html_output += '</div>'
     else:
         html_output += f'<div style="margin-left: 20px; margin-bottom: 5px; color: #666; font-family: Quicksand, sans-serif;">No concepts left in this book.</div>'
@@ -250,26 +250,16 @@ def generate_lesson_plan(series, book_order, page):
     <div style="margin-bottom: 20px;">
         <div style="background-color: {off_white}; padding: 15px; border-radius: 8px; border-left: 4px solid {dark_brown};">
             <h3 style="margin: 0 0 10px 0; color: {dark_brown}; font-family: 'Poller One', cursive;">Progress Overview</h3>
-            <div style="color: {dark_brown}; font-family: 'Quicksand', sans-serif; font-size: 1.1em; margin-bottom: 10px;">All concepts your student has learned in this series up to the current page</div>
+            <span class="subtitle-italic">All concepts your student has learned in this series up to the current page.</span>
             <div style="margin-bottom: 10px;"></div>
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <button id="tab-by-book" onclick="showTab('by-book')" style="font-family: 'Quicksand', sans-serif; font-size: 16px; background: {cream}; color: {dark_brown}; border: none; border-radius: 6px 6px 0 0; padding: 8px 20px; cursor: pointer;">By Book</button>
-                <button id="tab-by-category" onclick="showTab('by-category')" style="font-family: 'Quicksand', sans-serif; font-size: 16px; background: {cream}; color: {dark_brown}; border: none; border-radius: 6px 6px 0 0; padding: 8px 20px; cursor: pointer;">By Entire Category</button>
+                <button id="tab-by-book" class="tab-btn" onclick="showTab('by-book')">By Book</button>
+                <button id="tab-by-category" class="tab-btn" onclick="showTab('by-category')">By Entire Category</button>
             </div>
-            <div id="tab-content-by-book">{by_book_html}</div>
-            <div id="tab-content-by-category" style="display:none;">{by_cat_html}</div>
+            <div id="tab-content-by-book" class="tab-content">{by_book_html}</div>
+            <div id="tab-content-by-category" class="tab-content" style="display:none;">{by_cat_html}</div>
         </div>
     </div>
-    <script>
-    function showTab(tab) {{
-        document.getElementById('tab-content-by-book').style.display = (tab === 'by-book') ? '' : 'none';
-        document.getElementById('tab-content-by-category').style.display = (tab === 'by-category') ? '' : 'none';
-        document.getElementById('tab-by-book').style.background = (tab === 'by-book') ? '{off_white}' : '{cream}';
-        document.getElementById('tab-by-category').style.background = (tab === 'by-category') ? '{off_white}' : '{cream}';
-    }}
-    // Set default tab
-    showTab('by-book');
-    </script>
     '''
 
     return html_output
