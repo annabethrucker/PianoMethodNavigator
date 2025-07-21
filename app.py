@@ -93,7 +93,18 @@ def index():
         .tab-btn:focus { outline: none; }
         .tab-btn:hover { border-color: #84894a; }
         .tab-content { margin-top: 0; }
-        .subtitle-italic { font-style: italic; font-size: 1.1em; color: #291909; margin-bottom: 10px; display: block; }
+        .subtitle-italic { font-style: italic; font-size: 1.1em; color: #291909; margin-bottom: 10px; display: block; font-family: 'Quicksand', sans-serif !important; }
+        .pmn-end-of-book-msg { color: #291909 !important; font-weight: bold; }
+        /* New Concepts card styling */
+        .pmn-new-concepts-card { background: #84894A !important; color: #FFFDF9 !important; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .pmn-new-concepts-card h3, .pmn-new-concepts-card * { color: #FFFDF9 !important; font-family: 'Quicksand', sans-serif; }
+        /* Mobile adjustments */
+        @media (max-width: 600px) {
+            .selector-area-bg form > * { margin-bottom: 18px !important; }
+            .selector-area-bg form > *:last-child { margin-bottom: 0 !important; }
+            .pmn-whats-next-pages { grid-template-columns: 1fr !important; gap: 18px !important; }
+            .pmn-whats-next-pagecard { min-width: 0 !important; max-width: 100% !important; }
+        }
         </style>
         </head>
         <div class="selector-area-bg">
