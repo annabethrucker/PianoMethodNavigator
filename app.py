@@ -111,14 +111,14 @@ def index():
             <div class="widget-title">LESSON PLANNING ASSISTANT TOOL (BETA)</div>
             <form method="post" style="margin-bottom: 10px; text-align: center;">
                 <label>Series:
-                    <select name="series" onchange="this.form.submit()">
+                    <select name="series">
                         {% for s in series_options %}
                             <option value="{{s}}" {% if s == selected_series %}selected{% endif %}>{{s}}</option>
                         {% endfor %}
                     </select>
                 </label>
                 <label>Book:
-                    <select name="book" onchange="this.form.submit()">
+                    <select name="book">
                         {% for title, order in book_options[selected_series] %}
                             <option value="{{order}}" {% if order == selected_book %}selected{% endif %}>{{title}}</option>
                         {% endfor %}
