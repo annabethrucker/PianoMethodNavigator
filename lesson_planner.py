@@ -197,16 +197,16 @@ def generate_lesson_plan(series, book_order, page):
     # Card 2: New Concepts on This Page
     html_output += f"""
     <div style=\"margin-bottom: 20px;\">
-        <div style=\"background-color: {olive_light}; padding: 15px; border-radius: 8px; border-left: 4px solid {accent};\">
-            <h3 style=\"margin: 0 0 10px 0; color: {dark_brown}; font-family: 'Poller One', cursive;\">New Concepts on This Page</h3>
+        <div class='pmn-new-concepts-card'>
+            <h3>New Concepts on This Page</h3>
     """
     if not current_page_concepts.empty:
         for _, row in current_page_concepts.iterrows():
             concept_name = get_concept_display_name(row['Concept'])
             tags = get_concept_tags(row, show_intro_type=False)
-            html_output += f'<div style="margin-left: 20px; margin-bottom: 5px; font-family: Quicksand, sans-serif;"><span style="color: {dark_brown};">{concept_name}</span> {tags}</div>'
+            html_output += f'<div style="margin-left: 20px; margin-bottom: 5px;"><span>{concept_name}</span> {tags}</div>'
     else:
-        html_output += f"<p style='color: #666; font-family: Quicksand, sans-serif;'>No concepts introduced on this page!</p>"
+        html_output += f"<p style='color: #FFFDF9; font-family: Quicksand, sans-serif;'>No concepts introduced on this page!</p>"
     html_output += "</div>"
 
     # Card 3: What's Next (Concepts Coming Up Next)
@@ -222,7 +222,7 @@ def generate_lesson_plan(series, book_order, page):
                 p, page_concepts = whats_next_by_page[idx]
                 if p == 'next_book':
                     html_output += f'<div style="min-width: 0; max-width: 100%; background: {cream_dark}; border-radius: 6px; padding: 10px; min-height: 80px; box-sizing: border-box;">'
-                    html_output += f'<div style="font-family: Poller One, cursive; color: {olive}; font-size: 1.1em; margin-bottom: 8px;">You&#39;ve reached the end of this book!<br>Next Book: {page_concepts["title"]}</div>'
+                    html_output += f'<div class="pmn-end-of-book-msg" style="font-family: Poller One, cursive; font-size: 1.1em; margin-bottom: 8px;">You&#39;ve reached the end of this book!<br>Next Book: {page_concepts["title"]}</div>'
                     for page_num, concept, tags in page_concepts['concepts']:
                         html_output += f'<div style="color: {dark_brown}; font-family: Quicksand, sans-serif; margin-bottom: 3px;">P.{page_num} - {concept} {tags}</div>'
                     html_output += f'<div style="margin-top: 10px; font-size: 0.95em; font-family: Quicksand, sans-serif;"><em>For transition options to other series, visit the <a href="https://treefrogsolutions.co/transition-guide-piano-method-navigator/" target="_blank">Piano Method Navigator Transition Guide</a>.</em></div>'
