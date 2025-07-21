@@ -44,13 +44,25 @@ def index():
     return render_template_string('''
         <head>
         <link href="https://fonts.googleapis.com/css2?family=Poller+One&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <style>
+        .selector-area-bg {
+            background: url('https://treefrogsolutions.co/wp-content/uploads/2025/07/Piano-Method-Navigator-Header-6.png') center center / cover no-repeat;
+            padding: 30px 0 30px 0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .widget-title {
+            font-family: 'Poller One', cursive;
+            font-size: 2.1em;
+            text-align: center;
+            color: #291909;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+        }
         label { font-family: 'Poller One', cursive; font-size: 1.1em; margin-right: 10px; }
-        select, .select2-selection__rendered, .select2-results__option { font-family: 'Quicksand', sans-serif !important; font-size: 1em; }
-        .select2-container--default .select2-selection--single { height: 38px; }
+        select { font-family: 'Quicksand', sans-serif; font-size: 1em; height: 38px; }
         button[type=submit] {
             background: #84894a;
             color: #FFFDF9;
@@ -61,6 +73,7 @@ def index():
             padding: 8px 28px;
             cursor: pointer;
             margin-left: 10px;
+            text-transform: uppercase;
         }
         .selection-summary {
             font-family: 'Quicksand', sans-serif;
@@ -68,12 +81,23 @@ def index():
             color: #291909;
             margin-bottom: 18px;
         }
-        /* Make main output and grid full width */
-        .main-output-container { max-width: none !important; width: 100% !important; }
-        .pmn-whats-next-pages { max-width: none !important; width: 100% !important; }
+        /* Main output and grid full width, fixed for what's next */
+        .main-output-container { max-width: 1200px; width: 100%; margin: 0 auto; }
+        .pmn-whats-next-pages { max-width: 100%; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+        .pmn-whats-next-pagecard { min-width: 0; max-width: 100%; background: #FFFDF9; border-radius: 6px; padding: 10px; min-height: 80px; box-sizing: border-box; }
+        /* Tab styling */
+        .tab-btn { font-family: 'Quicksand', sans-serif; font-size: 16px; border-radius: 6px 6px 0 0; padding: 8px 20px; cursor: pointer; border: 2px solid #F2E0B5; background: #FFFDF9; color: #291909; margin-right: 4px; transition: background 0.2s, border 0.2s; }
+        .tab-btn.selected { background: #F2E0B5; border-bottom: 2px solid #F2E0B5; }
+        .tab-btn:not(.selected) { background: #FFFDF9; border: 2px solid #F2E0B5; }
+        .tab-btn:focus { outline: none; }
+        .tab-btn:hover { border-color: #84894a; }
+        .tab-content { margin-top: 0; }
+        .subtitle-italic { font-style: italic; font-size: 1.1em; color: #291909; margin-bottom: 10px; display: block; }
         </style>
         </head>
-        <form method="post" style="margin-bottom: 10px;">
+        <div class="widget-title">LESSON PLANNING ASSISTANT TOOL (BETA)</div>
+        <div class="selector-area-bg">
+        <form method="post" style="margin-bottom: 10px; text-align: center;">
             <label>Series:
                 <select name="series" onchange="this.form.submit()">
                     {% for s in series_options %}
@@ -89,42 +113,37 @@ def index():
                 </select>
             </label>
             <label>Page:
-                <select id="page-select" name="page" style="width: 80px;">
-                    <option></option>
+                <select name="page" style="width: 80px;">
                     {% for p in page_options %}
                         <option value="{{p}}" {% if p == selected_page %}selected{% endif %}>{{p}}</option>
                     {% endfor %}
                 </select>
             </label>
-            <button type="submit">Let's Plan</button>
+            <button type="submit">LET'S PLAN</button>
         </form>
         <div class="selection-summary">
             You have selected: <strong>{{selected_series}}</strong> – <strong>{{selected_book_title}}</strong>, Page <strong>{{selected_page}}</strong>
         </div>
+        </div>
         <div class="main-output-container">{{ result|safe }}</div>
         <script>
-        $(document).ready(function() {
-            $('#page-select').select2({
-                tags: true,
-                width: '80px',
-                dropdownAutoWidth: true,
-                theme: 'default',
-                placeholder: 'Type or select number',
-                allowClear: true
-            });
-        });
-        document.querySelector('select[name=series]').addEventListener('change', function() {
-            this.form.submit();
-        });
-        document.querySelector('select[name=book]').addEventListener('change', function() {
-            this.form.submit();
-        });
-        // Swap tab background colors: selected = tan (cream), unselected = off-white
-        window.showTab = function(tab) {
-            document.getElementById('tab-content-by-book').style.display = (tab === 'by-book') ? '' : 'none';
-            document.getElementById('tab-content-by-category').style.display = (tab === 'by-category') ? '' : 'none';
-            document.getElementById('tab-by-book').style.background = (tab === 'by-book') ? '#F2E0B5' : '#FFFDF9';
-            document.getElementById('tab-by-category').style.background = (tab === 'by-category') ? '#F2E0B5' : '#FFFDF9';
+        // Tab logic with outlined unselected tab
+        function showTab(tab) {
+            var byBookBtn = document.getElementById('tab-by-book');
+            var byCatBtn = document.getElementById('tab-by-category');
+            var byBookContent = document.getElementById('tab-content-by-book');
+            var byCatContent = document.getElementById('tab-content-by-category');
+            if (tab === 'by-book') {
+                byBookBtn.classList.add('selected');
+                byCatBtn.classList.remove('selected');
+                byBookContent.style.display = '';
+                byCatContent.style.display = 'none';
+            } else {
+                byBookBtn.classList.remove('selected');
+                byCatBtn.classList.add('selected');
+                byBookContent.style.display = 'none';
+                byCatContent.style.display = '';
+            }
         }
         // Set default tab
         showTab('by-book');
