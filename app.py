@@ -32,13 +32,15 @@ def index():
         result = generate_lesson_plan(selected_series, selected_book, selected_page)
     else:
         selected_book_title = book_options[selected_series][0][0]
-    # Get all unique pages for the selected book, as integers
-    pages_for_book = sorted(
-        set(
-            int(p) for p in df[(df['Series'] == selected_series) & (df['Book Order'] == selected_book)]['Page']
-            if str(p).isdigit()
-        )
-    )
+    # Get all unique pages for the selected book, as integers (all pages from min to max)
+    book_pages = df[(df['Series'] == selected_series) & (df['Book Order'] == selected_book)]['Page']
+    book_pages_int = [int(p) for p in book_pages if str(p).isdigit()]
+    if book_pages_int:
+        min_page = min(book_pages_int)
+        max_page = max(book_pages_int)
+        pages_for_book = list(range(min_page, max_page + 1))
+    else:
+        pages_for_book = [1]
     return render_template_string('''
         <head>
         <link href="https://fonts.googleapis.com/css2?family=Poller+One&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
@@ -66,6 +68,9 @@ def index():
             color: #291909;
             margin-bottom: 18px;
         }
+        /* Make main output and grid full width */
+        .main-output-container { max-width: none !important; width: 100% !important; }
+        .pmn-whats-next-pages { max-width: none !important; width: 100% !important; }
         </style>
         </head>
         <form method="post" style="margin-bottom: 10px;">
@@ -96,7 +101,7 @@ def index():
         <div class="selection-summary">
             You have selected: <strong>{{selected_series}}</strong> – <strong>{{selected_book_title}}</strong>, Page <strong>{{selected_page}}</strong>
         </div>
-        <div>{{ result|safe }}</div>
+        <div class="main-output-container">{{ result|safe }}</div>
         <script>
         $(document).ready(function() {
             $('#page-select').select2({
@@ -114,6 +119,15 @@ def index():
         document.querySelector('select[name=book]').addEventListener('change', function() {
             this.form.submit();
         });
+        // Swap tab background colors: selected = tan (cream), unselected = off-white
+        window.showTab = function(tab) {
+            document.getElementById('tab-content-by-book').style.display = (tab === 'by-book') ? '' : 'none';
+            document.getElementById('tab-content-by-category').style.display = (tab === 'by-category') ? '' : 'none';
+            document.getElementById('tab-by-book').style.background = (tab === 'by-book') ? '#F2E0B5' : '#FFFDF9';
+            document.getElementById('tab-by-category').style.background = (tab === 'by-category') ? '#F2E0B5' : '#FFFDF9';
+        }
+        // Set default tab
+        showTab('by-book');
         </script>
     ''',
     series_options=series_options,
