@@ -195,6 +195,29 @@ def index():
         document.getElementById('pmn-form').addEventListener('submit', function(e) {
             // Allow normal submit
         });
+
+        // Tab logic with outlined unselected tab
+        function showTab(tab) {
+            var byBookBtn = document.getElementById('tab-by-book');
+            var byCatBtn = document.getElementById('tab-by-category');
+            var byBookContent = document.getElementById('tab-content-by-book');
+            var byCatContent = document.getElementById('tab-content-by-category');
+            if (tab === 'by-book') {
+                byBookBtn.classList.add('selected');
+                byCatBtn.classList.remove('selected');
+                byBookContent.style.display = '';
+                byCatContent.style.display = 'none';
+            } else {
+                byBookBtn.classList.remove('selected');
+                byCatBtn.classList.add('selected');
+                byBookContent.style.display = 'none';
+                byCatContent.style.display = '';
+            }
+        }
+        // Set default tab
+        window.addEventListener('DOMContentLoaded', function() {
+            showTab('by-book');
+        });
         </script>
     ''',
     series_options=series_options,
