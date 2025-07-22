@@ -41,6 +41,21 @@ def index():
         pages_for_book = list(range(min_page, max_page + 1))
     else:
         pages_for_book = [1]
+    
+    # Pre-calculate page options for all series and books
+    page_options_all = {}
+    for s in series_options:
+        page_options_all[s] = {}
+        for title, order in book_options[s]:
+            book_pages = df[(df['Series'] == s) & (df['Book Order'] == order)]['Page']
+            book_pages_int = [int(p) for p in book_pages if str(p).isdigit()]
+            if book_pages_int:
+                min_page = min(book_pages_int)
+                max_page = max(book_pages_int)
+                page_options_all[s][order] = list(range(min_page, max_page + 1))
+            else:
+                page_options_all[s][order] = [1]
+    
     return render_template_string('''
         <head>
         <link href="https://fonts.googleapis.com/css2?family=Poller+One&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
@@ -143,21 +158,7 @@ def index():
         <script>
         // Data for dynamic dropdowns
         const bookOptions = {{ book_options | tojson }};
-        const pageOptions = {};
-        {% for s in series_options %}
-            pageOptions["{{s}}"] = {};
-            {% for title, order in book_options[s] %}
-                pageOptions["{{s}}"]["{{order}}"] = [
-                    {% set book_pages = df[(df['Series'] == s) & (df['Book Order'] == order)]['Page'] %}
-                    {% set book_pages_int = [p for p in book_pages if p|string|int is not none] %}
-                    {% if book_pages_int|length > 0 %}
-                        {% set min_page = book_pages_int|min %}
-                        {% set max_page = book_pages_int|max %}
-                        {% for p in range(min_page, max_page+1) %}{{p}}{% if not loop.last %}, {% endif %}{% endfor %}
-                    {% else %}1{% endif %}
-                ];
-            {% endfor %}
-        {% endfor %}
+        const pageOptions = {{ page_options_all | tojson }};
 
         // Update book dropdown when series changes
         document.getElementById('series-select').addEventListener('change', function() {
@@ -203,6 +204,7 @@ def index():
     selected_book_title=selected_book_title,
     selected_page=selected_page,
     page_options=pages_for_book,
+    page_options_all=page_options_all,
     result=result)
 
 if __name__ == '__main__':
